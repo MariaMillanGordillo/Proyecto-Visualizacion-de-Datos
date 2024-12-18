@@ -45,4 +45,4 @@ ax.grid(axis='y', linestyle='--', alpha=0.7)
 # Mostrar el gráfico en Streamlit
 st.pyplot(fig)
 
-
+st.write('La tecnología que más energía ha generado a lo largo de los años es la hidroeléctrica, seguida de la eólica y la solar.')
