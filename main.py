@@ -20,23 +20,27 @@ st.write('Datos de energias renovables')
 # Mostrar datos
 st.write(data)
 
-# Agrupar los datos por tecnología y sumar los valores totales para todos los años
-technology_distribution = data.groupby('Technology')[['F2000', 'F2001', 'F2002', 'F2003', 'F2004', 'F2005',
-                                                       'F2006', 'F2007', 'F2008', 'F2009', 'F2010', 'F2011',
-                                                       'F2012', 'F2013', 'F2014', 'F2015', 'F2016', 'F2017',
-                                                       'F2018', 'F2019', 'F2020', 'F2021', 'F2022', 'F2023']].sum()
+# Seleccionar un rango de años
+years = st.slider('Años', 2000, 2023, (2000, 2023))
+
+# Filtrar las columnas por el rango de años seleccionado
+selected_columns = [f'F{year}' for year in range(years[0], years[1] + 1)]
+filtered_data = data[['Technology'] + selected_columns]
+
+# Agrupar los datos por tecnología y sumar los valores totales para el rango de años seleccionado
+technology_distribution = filtered_data.groupby('Technology').sum()
 
 # Sumar los valores totales por tecnología a través de los años
 technology_distribution['Total'] = technology_distribution.sum(axis=1)
 technology_distribution = technology_distribution.sort_values(by='Total', ascending=False)
 
 # Crear el gráfico de barras
-st.subheader('Cantidad de Energía Generada por Tecnología (2000-2023)')
+st.subheader(f'Cantidad de Energía Generada por Tecnología ({years[0]}-{years[1]})')
 fig, ax = plt.subplots(figsize=(12, 8))
 technology_distribution['Total'].plot(kind='bar', color='skyblue', edgecolor='black', ax=ax)
 
 # Personalizar el gráfico
-ax.set_title("Cantidad Total de Energía Generada por Tecnología (2000-2023)", fontsize=14)
+ax.set_title(f"Cantidad Total de Energía Generada por Tecnología ({years[0]}-{years[1]})", fontsize=14)
 ax.set_xlabel("Tecnología", fontsize=12)
 ax.set_ylabel("Cantidad Total de Energía (GWh)", fontsize=12)
 ax.tick_params(axis='x', rotation=45, labelsize=10)
