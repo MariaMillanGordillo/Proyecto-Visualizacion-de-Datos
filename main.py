@@ -22,3 +22,5 @@ st.write('Datos de energias renovables')
 
 # Mostrar datos
 st.write(data)
+
+st.write('Hello world!')
