@@ -8,6 +8,13 @@ import seaborn as sns
 # Cargar datos
 data = pd.read_csv('Renewable_Energy.csv')
 
+# Dividir el dataset en dos según la columna 'Indicator'
+grouped_data = data.groupby('Indicator')
+
+# Crear dos datasets separados
+generation = grouped_data.get_group('Electricity Generation')
+capacity = grouped_data.get_group('Electricity Installed Capacity')
+
 # Encabezado
 st.header('Proyecto de Energias Renovables')
 
@@ -25,7 +32,7 @@ years = st.slider('Años', 2000, 2023, (2000, 2023))
 
 # Filtrar las columnas por el rango de años seleccionado
 selected_columns = [f'F{year}' for year in range(years[0], years[1] + 1)]
-filtered_data = data[['Technology'] + selected_columns]
+filtered_data = generation[['Technology'] + selected_columns]
 
 # Agrupar los datos por tecnología y sumar los valores totales para el rango de años seleccionado
 technology_distribution = filtered_data.groupby('Technology').sum()
