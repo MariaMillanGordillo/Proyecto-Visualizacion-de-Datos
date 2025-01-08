@@ -23,7 +23,7 @@ capacity.drop(columns=columns_to_drop, inplace=True)
 # Crear un desplegable en Streamlit para seleccionar el país
 st.subheader('Generación de energía por territorio según el tipo de energía')
 paises = data['Country'].unique().tolist()
-pais_seleccionado = st.selectbox('Selecciona un país', paises)
+pais_seleccionado = st.selectbox('Selecciona un territorio', paises)
 
 # Filtrar los datos para el país seleccionado
 datos_pais = generation[generation['Country'] == pais_seleccionado]
