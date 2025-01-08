@@ -60,7 +60,7 @@ for country in selected_countries:
     )
 
 # Personalizar el gráfico
-ax.set_title(f"Evolución de la Energía {selected_energy_type} Generada por País ({years[0]}-{years[1]})", fontsize=14)
+ax.set_title(f"Evolución de la Energía {selected_energy_type} Generada ({years[0]}-{years[1]})", fontsize=14)
 ax.set_xlabel("Año", fontsize=12)
 ax.set_ylabel("Cantidad de Energía (GWh)", fontsize=12)
 ax.legend(title="País")
