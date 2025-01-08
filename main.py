@@ -30,9 +30,13 @@ st.write(data)
 # Seleccionar un rango de años
 years = st.slider('Años', 2000, 2023, (2000, 2023))
 
+# Seleccionar tecnologías a incluir
+technology_options = data['Technology'].unique()
+selected_technologies = st.multiselect('Seleccionar Tecnologías a Incluir', technology_options, default=technology_options)
+
 # Filtrar las columnas por el rango de años seleccionado
 selected_columns = [f'F{year}' for year in range(years[0], years[1] + 1)]
-filtered_data = generation[['Technology'] + selected_columns]
+filtered_data = data[data['Technology'].isin(selected_technologies)][['Technology'] + selected_columns]
 
 # Agrupar los datos por tecnología y sumar los valores totales para el rango de años seleccionado
 technology_distribution = filtered_data.groupby('Technology').sum()
@@ -55,5 +59,3 @@ ax.grid(axis='y', linestyle='--', alpha=0.7)
 
 # Mostrar el gráfico en Streamlit
 st.pyplot(fig)
-
-st.write('La tecnología que más energía ha generado a lo largo de los años es la hidroeléctrica, seguida de la eólica y la solar.')
