@@ -5,11 +5,23 @@ import matplotlib.pyplot as plt
 # Cargar datos
 data = pd.read_csv('Renewable_Energy.csv')
 
+# Dividir el dataset en dos según la columna 'Indicator'
+grouped_data = data.groupby('Indicator')
+
+# Crear dos datasets separados
+generation = grouped_data.get_group('Electricity Generation')
+capacity = grouped_data.get_group('Electricity Installed Capacity')
+
+# Eliminar las columnas especificadas de ambos datasets
+columns_to_drop = ['Source', 'CTS_Name', 'CTS_Code', 'CTS_Full_Descriptor', 'Indicator']
+generation.drop(columns=columns_to_drop, inplace=True)
+capacity.drop(columns=columns_to_drop, inplace=True)
+
 # Título
 st.title('Proyecto de Energías Renovables')
 
 # Seleccionar un rango de años
-years = st.slider('Años', 2000, 2023, (2000, 2023))
+years = st.slider('Años', 2000, 2022, (2000, 2022))
 
 # Crear dos columnas para la selección de tipo de energía y países
 col1, col2 = st.columns(2)
@@ -25,7 +37,7 @@ with col1:
 
 with col2:
     # Seleccionar países usando multiselect
-    country_options = data['Country'].unique()
+    country_options = generation['Country'].unique()
     selected_countries = st.multiselect(
         'Seleccionar Países',
         options=country_options,
@@ -37,11 +49,11 @@ selected_columns = [f'F{year}' for year in range(years[0], years[1] + 1)]
 
 # Filtrar por tipo de energía
 if selected_energy_type == 'Renovable':
-    filtered_data = data[data['Energy_Type'] == 'Total Renewable']
+    filtered_data = generation[generation['Energy_Type'] == 'Total Renewable']
 elif selected_energy_type == 'No Renovable':
-    filtered_data = data[data['Energy_Type'] == 'Total Non-Renewable']
+    filtered_data = generation[generation['Energy_Type'] == 'Total Non-Renewable']
 else:
-    filtered_data = data
+    filtered_data = generation
 
 # Crear el gráfico de líneas
 st.subheader(f'Evolución de la Energía {selected_energy_type} Generada ({years[0]}-{years[1]})')
@@ -56,6 +68,7 @@ for country in selected_countries:
     ax.plot(
         years_index,
         aggregated_data.values,
+        marker='o',
         label=f"{country}"
     )
 
