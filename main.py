@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Cargar datos
+# CARGAR DATOS
 data = pd.read_csv('Renewable_Energy.csv')
 
 # Dividir el dataset en dos según la columna 'Indicator'
@@ -17,7 +17,7 @@ columns_to_drop = ['Source', 'CTS_Name', 'CTS_Code', 'CTS_Full_Descriptor', 'Ind
 generation.drop(columns=columns_to_drop, inplace=True)
 capacity.drop(columns=columns_to_drop, inplace=True)
 
-# Título
+# GRAFICO MARIA
 st.title('Proyecto de Energías Renovables')
 
 # Seleccionar un rango de años
@@ -81,3 +81,31 @@ ax.grid(axis='y', linestyle='--', alpha=0.7)
 
 # Mostrar el gráfico en Streamlit
 st.pyplot(fig)
+
+
+#GRAFICO CARMEN
+
+# Crear un desplegable en Streamlit para seleccionar el país
+st.subheader('Generación de energía por territorio según el tipo de energía')
+paises = data['Country'].unique().tolist()
+pais_seleccionado = st.selectbox('Selecciona un territorio', paises)
+
+# Filtrar los datos para el país seleccionado
+datos_pais = generation[generation['Country'] == pais_seleccionado]
+
+# Seleccionar el rango de años
+year_range = st.slider('Selecciona el rango de años', 2000, 2022, (2000, 2022))
+years_selected = [f'F{year}' for year in range(year_range[0], year_range[1] + 1)]
+
+# Generar gráficos en Streamlit
+for _, fila in datos_pais.iterrows():
+    energia = fila[years_selected]
+    tecnologia = fila['Technology']
+    st.write(f'Electricity Generation (GWh) in {pais_seleccionado} - {tecnologia}')
+    st.bar_chart(energia)
+    
+
+
+
+
+
