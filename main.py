@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 # CARGAR DATOS
 data = pd.read_csv('Renewable_Energy.csv')
@@ -103,8 +104,34 @@ for _, fila in datos_pais.iterrows():
     tecnologia = fila['Technology']
     st.write(f'Electricity Generation (GWh) in {pais_seleccionado} - {tecnologia}')
     st.bar_chart(energia)
-    
+   
+# Grafico total
 
+# Calcular el total de generación de energía para el rango de años seleccionado
+datos_pais['Total'] = datos_pais[years_selected].sum(axis=1)
+
+# Cambiar el nombre de la tecnología
+datos_pais['Technology'] = datos_pais['Technology'].replace('Hydropower (excl. Pumped Storage)', 'Hydropower')
+
+st.subheader(f'Total de energía generada en {pais_seleccionado}')
+
+# Crear un checkbox para incluir o excluir la tecnología 'Fossil Fuels'
+incluir_fossil_fuels = st.checkbox('Incluir combustibles fósiles', value=True)
+
+# Filtrar los datos según la selección del checkbox
+if not incluir_fossil_fuels:
+    datos_pais = datos_pais[datos_pais['Technology'] != 'Fossil fuels']
+
+# Create a bar plot using matplotlib
+fig, ax = plt.subplots(figsize=(10, 6))
+sns.barplot(data=datos_pais, x='Technology', y='Total',color='red')
+ax.set_title(f'Total Electricity Generation by Technology in {pais_seleccionado}')
+ax.set_xlabel('Technology')
+ax.set_ylabel('Total (GWh)')
+ax.set_xticklabels(datos_pais['Technology'], rotation=45)
+
+# Display the plot in Streamlit
+st.pyplot(fig)
 
 
 
