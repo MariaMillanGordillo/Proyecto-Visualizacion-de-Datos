@@ -21,6 +21,9 @@ capacity.drop(columns=columns_to_drop, inplace=True)
 # GRAFICO MARIA
 st.title('Proyecto de Energías Renovables')
 
+# Añadir una imagen desde un archivo local
+st.image("imagen_introduccion.webp", use_container_width=True)
+
 # Seleccionar un rango de años
 years = st.slider('Años', 2000, 2022, (2000, 2022))
 
