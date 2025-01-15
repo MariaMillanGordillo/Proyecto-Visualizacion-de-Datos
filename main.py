@@ -104,8 +104,55 @@ for _, fila in datos_pais.iterrows():
     st.write(f'Electricity Generation (GWh) in {pais_seleccionado} - {tecnologia}')
     st.bar_chart(energia)
     
+#GRAFICO PABLO
 
+# Lista de países de la Unión Europea
+eu_countries = [
+    "Austria", "Belgium", "Bulgaria", "Croatia, Rep. of", "Cyprus", "Czech Rep.",
+    "Denmark", "Estonia, Rep. of", "Finland", "France", "Germany", "Greece", "Hungary",
+    "Ireland", "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands, The",
+    "Poland, Rep. of", "Portugal", "Romania", "Slovak Rep.", "Slovenia, Rep. of", "Spain", "Sweden"
+]
 
+# Filtrar datos para países de la UE
+eu_data = generation[generation['Country'].isin(eu_countries)]
 
+# Selección de países
+country_options = ["Todos"] + eu_countries
+selected_countries = st.multiselect('Seleccionar Países', options=country_options, default="Todos")
 
+# Selección de tecnología
+technology_options = ["Todas"] + list(generation['Technology'].dropna().unique())
+selected_technology = st.selectbox('Seleccionar Tecnología', options=technology_options)
 
+if selected_technology != "Todas":
+    eu_data = eu_data[eu_data['Technology'] == selected_technology]
+
+# Selección de rango de años
+year_columns = [col for col in eu_data.columns if col.startswith('F')]
+years = [int(col[1:]) for col in year_columns]
+year_range = st.slider('Seleccionar Rango de Años', min_value=min(years), max_value=max(years), value=(min(years), max(years)))
+selected_columns = [f'F{year}' for year in range(year_range[0], year_range[1] + 1)]
+
+# Calcular el total de generación de energía para los países de la UE en el rango de años seleccionado
+eu_data['Total_Generation'] = eu_data[selected_columns].sum(axis=1)
+total_generation_eu = eu_data['Total_Generation'].sum()
+
+# Calcular el porcentaje de cada país
+eu_data['Percentage'] = (eu_data['Total_Generation'] / total_generation_eu) * 100
+
+if "Todos" not in selected_countries:
+    eu_data = eu_data[eu_data['Country'].isin(selected_countries)]
+
+# Ordenar por porcentaje
+eu_data_sorted = eu_data.sort_values(by='Percentage', ascending=False)
+
+# Crear gráfico de barras con st.bar_chart
+st.subheader(f"Distribución porcentual de la generación de energía en la UE ({year_range[0]}-{year_range[1]})")
+
+# Preparar datos para st.bar_chart
+chart_data = eu_data_sorted[['Country', 'Percentage', 'Technology']]
+chart_data = chart_data.sort_values(by='Percentage', ascending=False)
+
+# Mostrar gráfico en Streamlit
+st.bar_chart(chart_data, x='Country', y='Percentage', color='Technology', use_container_width=True)
