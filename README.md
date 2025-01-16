@@ -26,7 +26,7 @@ streamlit run main.py
 
 ## Dataset
 
-El conjunto de datos utilizado proviene de [Kaggle](https://www.kaggle.com/datasets/pinuto/global-energy-generation-and-capacity-imf). Contiene información sobre:
+El conjunto de datos utilizado proviene de [Kaggle: Global Energy Generation & Capacity (IMF)](https://www.kaggle.com/datasets/pinuto/global-energy-generation-and-capacity-imf). Contiene información sobre:
 
 - Generación de energía (GWh) por país.
 - Tecnologías utilizadas (hidroeléctrica, combustibles fósiles, solar, eólica, etc.).
