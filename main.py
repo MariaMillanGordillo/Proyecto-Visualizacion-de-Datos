@@ -18,11 +18,21 @@ columns_to_drop = ['Source', 'CTS_Name', 'CTS_Code', 'CTS_Full_Descriptor', 'Ind
 generation.drop(columns=columns_to_drop, inplace=True)
 capacity.drop(columns=columns_to_drop, inplace=True)
 
-# GRAFICO MARIA
-st.title('Proyecto de Energías Renovables')
+col1, col2 = st.columns([2, 1])
 
-# Añadir una imagen desde un archivo local
-st.image("imagen_introduccion.webp", use_container_width=True)
+with col1:
+    # Título y descripción
+    st.title('Energías Renovables y Combustibles Fósiles')
+    st.markdown(
+        """
+        Este proyecto analiza la generación y distribución de energía renovable y no renovable
+        en distintos territorios y tecnologías.
+        """
+    )
+
+with col2:
+    # Imagen en la segunda columna
+    st.image("imagen_introduccion.webp", width=200, caption="Energía sostenible")
 
 # Diferentes páginas
 opcion = st.sidebar.radio("Selecciona un tipo de visualización:", ["Energía por territorio", "Comparativas", "Energía en la UE"])
