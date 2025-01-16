@@ -108,12 +108,28 @@ if opcion == 'Energía por territorio':
     year_range = st.slider('Selecciona el rango de años', 2000, 2022, (2000, 2022))
     years_selected = [f'F{year}' for year in range(year_range[0], year_range[1] + 1)]
 
-    # Generar gráficos en Streamlit
-    for _, fila in datos_pais.iterrows():
-        energia = fila[years_selected]
-        tecnologia = fila['Technology']
-        st.write(f'Electricity Generation (GWh) in {pais_seleccionado} - {tecnologia}')
-        st.bar_chart(energia)
+    # Seleccionar la tecnologia
+    tech = ["Todas"] + list(datos_pais['Technology'].dropna().unique())
+    tech_selected = st.selectbox('Seleccionar tipo de energía', options=tech)
+
+    # Filtrar los datos para la tecnología seleccionada
+    if tech_selected != "Todas":
+        datos_pais_tech = datos_pais[datos_pais['Technology'] == tech_selected][years_selected]
+        # Generar gráfico de barras para la tecnología seleccionada
+        st.write(f'Generación de Energía en {pais_seleccionado} - {tech_selected}')
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.barplot(data=datos_pais_tech, color='olivedrab')
+        ax.set_ylim(datos_pais_tech.min().min() * 0.9, datos_pais_tech.max().max() * 1.1)
+        st.pyplot(fig)
+    
+    
+    else: 
+        st.write(f'Generación de Energía en {pais_seleccionado} - Todas las tecnologías')
+        datos_pais_tech = datos_pais[years_selected].sum()
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.barplot(data=datos_pais_tech, color='olivedrab')
+        ax.set_ylim(datos_pais_tech.min().min() * 0.9, datos_pais_tech.max().max() * 1.1)
+        st.pyplot(fig)
     
     # Grafico total
 
