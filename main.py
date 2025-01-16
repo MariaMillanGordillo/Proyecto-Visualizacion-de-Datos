@@ -107,6 +107,7 @@ if opcion == 'Energía por territorio':
     # Seleccionar el rango de años
     year_range = st.slider('Selecciona el rango de años', 2000, 2022, (2000, 2022))
     years_selected = [f'F{year}' for year in range(year_range[0], year_range[1] + 1)]
+    years_label = [year for year in range(year_range[0], year_range[1] + 1)]
 
     # Seleccionar la tecnologia
     tech = ["Todas"] + list(datos_pais['Technology'].dropna().unique())
@@ -120,6 +121,7 @@ if opcion == 'Energía por territorio':
         fig, ax = plt.subplots(figsize=(10, 6))
         sns.barplot(data=datos_pais_tech, color='olivedrab')
         ax.set_ylim(datos_pais_tech.min().min() * 0.9, datos_pais_tech.max().max() * 1.1)
+        ax.set_xticklabels(years_label, rotation=45)
         st.pyplot(fig)
     
     
@@ -129,6 +131,7 @@ if opcion == 'Energía por territorio':
         fig, ax = plt.subplots(figsize=(10, 6))
         sns.barplot(data=datos_pais_tech, color='olivedrab')
         ax.set_ylim(datos_pais_tech.min().min() * 0.9, datos_pais_tech.max().max() * 1.1)
+        ax.set_xticklabels(years_label, rotation=45)
         st.pyplot(fig)
     
     # Grafico total
