@@ -240,6 +240,8 @@ if opcion == 'Energía a lo largo de los años':
 
     # Grafica capacidad instalada 
 
+    st.subheader('Capacidad Instalada de Energías Renovables')
+
     capacidad_pais = capacity[capacity['Country'] == pais_seleccionado]
     # Eliminar la tecnología 'Fossil fuels' de capacidad_pais
     capacidad_pais = capacidad_pais[capacidad_pais['Technology'] != 'Fossil fuels']
@@ -250,7 +252,6 @@ if opcion == 'Energía a lo largo de los años':
     # Crear una representación de la suma en función de los años
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.lineplot(x=years_label, y=capacidad_pais_sum.values, marker='o', ax=ax, color='olivedrab')
-    ax.set_title(f'Capacidad Instalada de Energías Renovables en {pais_seleccionado}')
     ax.set_xlabel('Año')
     ax.set_ylabel('Capacidad Instalada (MW)')
     ax.grid(axis='y', linestyle='--', alpha=0.7)
