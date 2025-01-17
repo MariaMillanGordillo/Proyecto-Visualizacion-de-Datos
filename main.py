@@ -193,6 +193,7 @@ if opcion == 'Energía a lo largo de los años':
         datos_pais_tech = datos_pais[years_selected].sum()
         fig, ax = plt.subplots(figsize=(10, 6))
         sns.barplot(data=datos_pais_tech, color='olivedrab')
+        ax.set_ylabel('Energía eléctrica generada (GWh)')
         ax.set_ylim(datos_pais_tech.min().min() * 0.9, datos_pais_tech.max().max() * 1.1)
         ax.set_xticklabels(years_label, rotation=45)
         st.pyplot(fig)
