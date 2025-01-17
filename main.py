@@ -25,8 +25,8 @@ with col1:
     st.title('Energías Renovables y Combustibles Fósiles')
     st.markdown(
         """
-        Este proyecto analiza la generación y distribución de energía renovable y no renovable
-        en distintos territorios y tecnologías.
+        Este proyecto analiza la generación de energía eléctrica en distintos territorios 
+        y las fuentes renovables y no renovables que se utilizan.
         """
     )
 
@@ -49,7 +49,7 @@ if opcion == "Comparativas":
         # Seleccionar tipo de energía usando segmented control
         energy_type_options = ['Renovable', 'No Renovable', 'Total']
         selected_energy_type = st.segmented_control(
-            'Seleccionar Tipo de Energía',
+            'Seleccionar Tipo de Fuente',
             options=energy_type_options,
             default='Total'
         )
@@ -101,33 +101,85 @@ if opcion == "Comparativas":
     # Mostrar el gráfico en Streamlit
     st.pyplot(fig)
 
+    # Grafico 2
+    st.subheader('Comparación Porcentual entre las Fuentes de Energía')
+    st.markdown(''' Se representa el porcentaje que supone cada fuente en 
+                cuanto a la producción de energía y el porcentaje que supone la capacidad
+                de su instalación''')
+    
+    # Crear un desplegable en Streamlit para seleccionar el país
+    selected_country = st.selectbox('Seleccionar País', options=country_options, index=0)
+
+    # Filtrar los datos para el país seleccionado
+    filtered_generation = generation[generation['Country'] == selected_country]
+    filtered_capacity = capacity[capacity['Country'] == selected_country]
+
+    # Calcular el porcentaje de cada tipo de tecnología en el dataset generation para el país seleccionado
+    filtered_generation['Total_Generation'] = filtered_generation[selected_columns].sum(axis=1)
+    total_generation_country = filtered_generation['Total_Generation'].sum()
+    generation_percentage_country = filtered_generation.groupby('Technology')['Total_Generation'].sum() / total_generation_country * 100
+
+    # Calcular el porcentaje de cada tipo de tecnología en el dataset capacity para el país seleccionado
+    filtered_capacity['Total_Capacity'] = filtered_capacity[selected_columns].sum(axis=1)
+    total_capacity_country = filtered_capacity['Total_Capacity'].sum()
+    capacity_percentage_country = filtered_capacity.groupby('Technology')['Total_Capacity'].sum() / total_capacity_country * 100
+
+    # Crear un DataFrame con los porcentajes para el país seleccionado
+    comparison_df_country = pd.DataFrame({
+        'Technology': generation_percentage_country.index,
+        'Generation_Percentage': generation_percentage_country.values,
+        'Capacity_Percentage': capacity_percentage_country.values
+    }).reset_index(drop=True)
+
+    # Crear el gráfico de barras para el país seleccionado
+    fig, ax = plt.subplots(figsize=(12, 8))
+    comparison_df_country.plot(kind='bar', x='Technology', ax=ax)
+    ax.set_title(f'Comparación de Porcentajes entre Generación y Capacidad por Tecnología en {selected_country}')
+    ax.set_xlabel('Tecnología')
+    ax.set_ylabel('Porcentaje (%)')
+    ax.legend(['Generación', 'Capacidad'])
+    ax.grid(axis='y', linestyle='--', alpha=0.7)
+
+    # Mostrar el gráfico en Streamlit
+    st.pyplot(fig)
+    
 
 #GRAFICO CARMEN
 
 if opcion == 'Energía por territorio':
 
     # Crear un desplegable en Streamlit para seleccionar el país
-    st.subheader('Generación de energía por territorio según el tipo de energía')
-    paises = data['Country'].unique().tolist()
-    pais_seleccionado = st.selectbox('Selecciona un territorio', paises)
+    st.subheader('Generación de Energía Eléctrica por territorio')
+    st.markdown(''' Los datos están representados a lo largo de los años y divididos según la
+                fuente de energía o el total ''')
+    
+    side1, side2 = st.columns(2)
+
+    with side1:
+        paises = data['Country'].unique().tolist()
+        pais_seleccionado = st.selectbox('Seleccionar Territorio', paises)
+
+    # Filtrar los datos para el país seleccionado
+    datos_pais = generation[generation['Country'] == pais_seleccionado]
+
+    with side2: 
+        # Seleccionar la tecnologia
+        tech = ["Todas"] + list(datos_pais['Technology'].dropna().unique())
+        tech_selected = st.selectbox('Seleccionar Tipo de Fuente', options=tech)
 
     # Filtrar los datos para el país seleccionado
     datos_pais = generation[generation['Country'] == pais_seleccionado]
 
     # Seleccionar el rango de años
-    year_range = st.slider('Selecciona el rango de años', 2000, 2022, (2000, 2022))
+    year_range = st.slider('Seleccionar Rango de Años', 2000, 2022, (2000, 2022))
     years_selected = [f'F{year}' for year in range(year_range[0], year_range[1] + 1)]
     years_label = [year for year in range(year_range[0], year_range[1] + 1)]
-
-    # Seleccionar la tecnologia
-    tech = ["Todas"] + list(datos_pais['Technology'].dropna().unique())
-    tech_selected = st.selectbox('Seleccionar tipo de energía', options=tech)
 
     # Filtrar los datos para la tecnología seleccionada
     if tech_selected != "Todas":
         datos_pais_tech = datos_pais[datos_pais['Technology'] == tech_selected][years_selected]
         # Generar gráfico de barras para la tecnología seleccionada
-        st.write(f'Generación de Energía en {pais_seleccionado} - {tech_selected}')
+        st.write(f'Generación de Energía Eléctrica en {pais_seleccionado} - {tech_selected}')
         fig, ax = plt.subplots(figsize=(10, 6))
         sns.barplot(data=datos_pais_tech, color='olivedrab')
         ax.set_ylim(datos_pais_tech.min().min() * 0.9, datos_pais_tech.max().max() * 1.1)
@@ -136,7 +188,7 @@ if opcion == 'Energía por territorio':
     
     
     else: 
-        st.write(f'Generación de Energía en {pais_seleccionado} - Todas las tecnologías')
+        st.write(f'Generación de Energía Eléctrica en {pais_seleccionado} - Total')
         datos_pais_tech = datos_pais[years_selected].sum()
         fig, ax = plt.subplots(figsize=(10, 6))
         sns.barplot(data=datos_pais_tech, color='olivedrab')
@@ -152,10 +204,10 @@ if opcion == 'Energía por territorio':
     # Cambiar el nombre de la tecnología
     datos_pais['Technology'] = datos_pais['Technology'].replace('Hydropower (excl. Pumped Storage)', 'Hydropower')
 
-    st.subheader(f'Total de energía generada según el tipo')
+    st.subheader(f'Total de Energía Generada en función de la Fuente')
 
     # Crear un checkbox para incluir o excluir la tecnología 'Fossil Fuels'
-    incluir_fossil_fuels = st.checkbox('Incluir combustibles fósiles', value=True)
+    incluir_fossil_fuels = st.checkbox('Incluir Combustibles Fósiles', value=True)
 
     # Filtrar los datos según la selección del checkbox
     if not incluir_fossil_fuels:
@@ -185,12 +237,13 @@ if opcion == 'Energía por territorio':
         ax.set_xticklabels(datos_pais['Technology'], rotation=45)
         st.pyplot(fig)
 
+
 #GRAFICO PABLO
 
 if opcion == "Energía en la UE":
 
     # Crear gráfico de barras con st.bar_chart
-    st.subheader(f"Distribución porcentual de la generación de energía en la UE (2000 - 2023)")
+    st.subheader(f"Distribución porcentual de la Generación de Energía Eléctrica en la UE (2000 - 2023)")
 
     # Lista de países de la Unión Europea
     eu_countries = [
@@ -209,7 +262,7 @@ if opcion == "Energía en la UE":
 
     # Selección de tecnología
     technology_options = ["Todas"] + list(generation['Technology'].dropna().unique())
-    selected_technology = st.selectbox('Seleccionar Tecnología', options=technology_options)
+    selected_technology = st.selectbox('Seleccionar Tipo de Fuente', options=technology_options)
 
     if selected_technology != "Todas":
         eu_data = eu_data[eu_data['Technology'] == selected_technology]
