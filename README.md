@@ -11,7 +11,7 @@ Desarrollado por **Carmen Linares Vázquez**, **María Millán Gordillo** y **Pa
 
 El proyecto permite explorar la generación de energía eléctrica en función de fuentes renovables y no renovables a nivel global, así como comparar tendencias entre países y analizar la situación de la Unión Europea.
 
-La aplicación incluye diferentes secciones para **Generación de energía por territorio**, **Comparativas**, **Energía en la Unión Europea** y un **Mapa de energía interactivo** para visualizar la generación eléctrica a nivel global.
+La aplicación incluye diferentes secciones para **Generación de energía a lo largo de los años**, **Comparativas**, **Energía en la Unión Europea** y un **Mapa de energía interactivo** para visualizar la generación eléctrica a nivel global.
 
 ---
 
@@ -51,10 +51,12 @@ Otros archivos:
 
 ## Funcionalidades
 
-### 1. Generación de energía por territorio
+### 1. Generación de energía a lo largo de los años
 
 - Selecciona un país y una tecnología específica para visualizar los datos.
 - Elige un rango de años para analizar tendencias.
+- Analiza la energía generada en función de la fuenta.
+- Muestra la capacidad instalada de energías renovables.
 
 ### 2. Comparativas
 
