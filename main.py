@@ -152,7 +152,7 @@ if opcion == 'Energía a lo largo de los años':
     # Crear un desplegable en Streamlit para seleccionar el país
     st.subheader('Generación de Energía Eléctrica por territorio')
     st.markdown(''' Los datos están representados a lo largo de los años y divididos según la
-                fuente de energía o el total ''')
+                fuente de energía o el total. ''')
     
     side1, side2 = st.columns(2)
 
@@ -237,6 +237,27 @@ if opcion == 'Energía a lo largo de los años':
         ax.set_ylabel('Total (GWh)')
         ax.set_xticklabels(datos_pais['Technology'], rotation=45)
         st.pyplot(fig)
+
+    # Grafica capacidad instalada 
+
+    capacidad_pais = capacity[capacity['Country'] == pais_seleccionado]
+    # Eliminar la tecnología 'Fossil fuels' de capacidad_pais
+    capacidad_pais = capacidad_pais[capacidad_pais['Technology'] != 'Fossil fuels']
+
+    # Sumar todas las columnas seleccionadas (years_selected)
+    capacidad_pais_sum = capacidad_pais[years_selected].sum()
+
+    # Crear una representación de la suma en función de los años
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.lineplot(x=years_label, y=capacidad_pais_sum.values, marker='o', ax=ax, color='olivedrab')
+    ax.set_title(f'Capacidad Instalada de Energías Renovables en {pais_seleccionado}')
+    ax.set_xlabel('Año')
+    ax.set_ylabel('Capacidad Instalada (MW)')
+    ax.grid(axis='y', linestyle='--', alpha=0.7)
+
+    # Mostrar el gráfico en Streamlit
+    st.pyplot(fig)
+
 
 
 #GRAFICO PABLO
