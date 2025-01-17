@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import plotly.express as px
 
 # CARGAR DATOS
 data = pd.read_csv('Renewable_Energy.csv')
@@ -35,7 +36,7 @@ with col2:
     st.image("imagen_introduccion.webp", width=200, caption="Energía sostenible")
 
 # Diferentes páginas
-opcion = st.sidebar.radio("Selecciona un tipo de visualización:", ["Energía por territorio", "Comparativas", "Energía en la UE"])
+opcion = st.sidebar.radio("Selecciona un tipo de visualización:", ["Energía a lo largo de los años", "Comparativas", "Energía en la UE", "Mapa de Energía"])
 
 # GRAFICOS MARIA
 if opcion == "Comparativas":
@@ -146,7 +147,7 @@ if opcion == "Comparativas":
 
 #GRAFICO CARMEN
 
-if opcion == 'Energía por territorio':
+if opcion == 'Energía a lo largo de los años':
 
     # Crear un desplegable en Streamlit para seleccionar el país
     st.subheader('Generación de Energía Eléctrica por territorio')
@@ -270,7 +271,7 @@ if opcion == "Energía en la UE":
     # Selección de rango de años
     year_columns = [col for col in eu_data.columns if col.startswith('F')]
     years = [int(col[1:]) for col in year_columns]
-    year_range = st.slider('Seleccionar Rango de Años', min_value=min(years), max_value=max(years), value=(min(years), max(years)))
+    year_range = st.slider('Seleccionar Rango de Años', min_value=min(years), max_value=max(years) - 1, value=(min(years), max(years) - 1))
     selected_columns = [f'F{year}' for year in range(year_range[0], year_range[1] + 1)]
 
     # Calcular el total de generación de energía para los países de la UE en el rango de años seleccionado
@@ -292,3 +293,61 @@ if opcion == "Energía en la UE":
 
     # Mostrar gráfico en Streamlit
     st.bar_chart(chart_data, x='Country', y='Percentage', color='Technology', use_container_width=True)
+
+# MAPA PABLO
+
+if opcion == "Mapa de Energía":
+
+    # Configurar la página de Streamlit
+    st.subheader("Mapa Interactivo de Generación de Electricidad por País")
+
+    # Sección de filtros en la barra lateral
+    st.sidebar.header("Filtros")
+
+    # Crear un filtro para seleccionar el año (columnas que comienzan con "F"), eliminando la "F"
+    year_options = {col: col[1:] for col in generation.columns if col.startswith("F") and col != "F2023"}  # Crear un diccionario sin incluir "F2023"
+    year = st.sidebar.selectbox("Selecciona el año:", options=year_options.values())
+    selected_year = [key for key, value in year_options.items() if value == year][0]  # Obtener la clave original con "F"
+
+    # Crear un filtro para seleccionar el tipo de energía
+    energy_type = st.sidebar.selectbox("Selecciona el tipo de energía:", generation["Energy_Type"].unique())
+
+    # Filtrar datos según los criterios seleccionados y asegurarse de que la columna CTS_Name sea "Electricity Generation"
+    filtered_data_map = generation[(generation["Energy_Type"] == energy_type)]
+
+    # Verificar si hay datos disponibles después del filtrado
+    if filtered_data_map.empty:
+        # Mostrar un mensaje de advertencia si no hay datos
+        st.warning("No hay datos disponibles para los filtros seleccionados.")
+    else:
+        # Preparar los datos para el mapa
+        map_data = filtered_data_map.groupby(["Country", "ISO3"])[selected_year].sum().reset_index()  # Agrupar por país y sumar valores
+        map_data = map_data.rename(columns={selected_year: "Electricity_Generation"})  # Renombrar la columna del año para claridad
+
+        # Crear un mapa coroplético usando Plotly Express
+        fig = px.choropleth(
+            map_data,
+            locations="ISO3",  # Código ISO de los países para ubicarlos en el mapa
+            color="Electricity_Generation",  # Color según la generación de electricidad
+            hover_name="Country",  # Nombre del país al pasar el ratón por encima
+            color_continuous_scale="Viridis",  # Escala de colores continua
+            title=f"Generación de Electricidad ({year}) - {energy_type}",  # Título dinámico del gráfico
+            labels={"Electricity_Generation": "Generación (GWh)"},  # Etiqueta para la leyenda
+        )
+
+        # Personalizar la apariencia del mapa con un rango ajustado
+        fig.update_coloraxes(cmin=0, cmax=map_data["Electricity_Generation"].quantile(0.9))  # Ajustar rango máximo al percentil 95
+
+        # Personalizar la apariencia del mapa
+        fig.update_geos(
+            showcoastlines=True,  # Mostrar líneas costeras
+            coastlinecolor="LightGray",  # Color de las líneas costeras
+            showland=True,  # Mostrar la tierra
+            landcolor="White"  # Color de la tierra
+        )
+
+        # Mostrar el gráfico en la aplicación
+        st.plotly_chart(fig, use_container_width=True)
+
+    # Mostrar una nota informativa para el usuario
+    st.info("Selecciona diferentes filtros en el panel lateral para explorar los datos.")
